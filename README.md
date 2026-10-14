@@ -30,6 +30,23 @@ The dashboard contains five sections:
 4. Cancellation
 5. Ratings
 
+## Dashboard Screenshots
+
+### Overall
+![Overall Dashboard](Overall.png)
+
+### Vehicle Type
+![Vehicle Type Dashboard](Vehicle%20Type.png)
+
+### Revenue
+![Revenue Dashboard](Revenue.png)
+
+### Cancellation
+![Cancellation Dashboard](Cancellation.png)
+
+### Ratings
+![Ratings Dashboard](Ratings.png)
+
 ## Project Files
 - `ola_ride_analysis.sql` — SQL analysis queries
 - `Ola Dashboard.pbix` — Power BI dashboard
