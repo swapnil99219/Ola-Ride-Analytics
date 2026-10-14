@@ -20,8 +20,26 @@ The project uses a 100,000-row booking dataset to explore operational patterns a
 - How many rides used UPI payments?
 - What is the average customer rating by vehicle type?
 - What is the total booking value of successful rides?
-- What are the reasons for incomplete rides?
+- What are the reasons for incomplete ride?
 
+  
+  ## Advanced SQL Analysis
+
+- What is the monthly revenue trend?
+- Which vehicle types generate the highest revenue?
+- What percentage of bookings are successful, cancelled, or incomplete?
+- Which payment methods contribute the most revenue?
+- What is the daily booking trend?
+- Which customers generate the highest total booking value?
+- What is the average booking value by vehicle type?
+- What are the top-performing vehicle types based on successful bookings?
+- How do cancellation reasons vary between customers and drivers?
+- Which vehicle types have the highest customer ratings?
+- What is the running total of revenue over time?
+- How do vehicle types rank by total revenue?
+- Which customers rank highest based on their booking activity?
+- What is the contribution of each vehicle type to total revenue?
+- Which vehicle types have the top three highest-value bookings?
 ## Power BI Dashboard
 The dashboard contains five sections:
 1. Overall
