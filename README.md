@@ -33,19 +33,19 @@ The dashboard contains five sections:
 ## Dashboard Screenshots
 
 ### Overall
-![Overall Dashboard](Overall.png)
+<img width="1162" height="727" alt="Overall" src="https://github.com/user-attachments/assets/1d7d0799-11bc-4245-96c2-efdebf7aa6f4" />
 
 ### Vehicle Type
-![Vehicle Type Dashboard](Vehicle%20Type.png)
+<img width="1168" height="847" alt="Vehicle Type" src="https://github.com/user-attachments/assets/4a21c5b6-f482-422f-b2eb-c1154036f89f" />
 
 ### Revenue
-![Revenue Dashboard](Revenue.png)
+<img width="1172" height="862" alt="Revenue" src="https://github.com/user-attachments/assets/523ddaf2-867b-4096-a991-cfc4fdeb5b7a" />
 
 ### Cancellation
-![Cancellation Dashboard](Cancellation.png)
+<img width="1165" height="848" alt="Cancellation" src="https://github.com/user-attachments/assets/66c65443-c5ab-45b9-9802-f36f4533f363" />
 
 ### Ratings
-![Ratings Dashboard](Ratings.png)
+<img width="1167" height="850" alt="Ratings" src="https://github.com/user-attachments/assets/f60063c7-a102-4526-b953-329c3554d1ad" />
 
 ## Project Files
 - `ola_ride_analysis.sql` — SQL analysis queries
