@@ -254,3 +254,269 @@ FROM total_successful_ride_value;
 SELECT *
 FROM incomplete_rides_reason
 LIMIT 10;
+
+-- ============================================
+-- OLA RIDE ANALYTICS
+-- ADVANCED SQL BUSINESS QUESTIONS
+-- Q11 TO Q25
+-- ============================================
+
+
+-- Q11. Calculate the booking success rate (%).
+
+SELECT
+    COUNT(*) AS total_bookings,
+    SUM(CASE WHEN Booking_Status = 'Success' THEN 1 ELSE 0 END)
+        AS successful_bookings,
+    ROUND(
+        100.0 * SUM(CASE WHEN Booking_Status = 'Success' THEN 1 ELSE 0 END)
+        / NULLIF(COUNT(*), 0),
+        2
+    ) AS success_rate_percentage
+FROM bookings;
+
+
+-- Q12. Calculate the cancellation rate for each vehicle type.
+
+SELECT
+    Vehicle_Type,
+    COUNT(*) AS total_bookings,
+    SUM(CASE
+        WHEN Booking_Status LIKE '%Cancel%' THEN 1
+        ELSE 0
+    END) AS cancelled_bookings,
+    ROUND(
+        100.0 * SUM(CASE
+            WHEN Booking_Status LIKE '%Cancel%' THEN 1
+            ELSE 0
+        END) / NULLIF(COUNT(*), 0),
+        2
+    ) AS cancellation_rate_percentage
+FROM bookings
+GROUP BY Vehicle_Type
+ORDER BY cancellation_rate_percentage DESC;
+
+
+-- Q13. Find the top 5 vehicle types by total booking value.
+
+SELECT
+    Vehicle_Type,
+    ROUND(SUM(Booking_Value), 2) AS total_booking_value
+FROM bookings
+GROUP BY Vehicle_Type
+ORDER BY total_booking_value DESC
+LIMIT 5;
+
+
+-- Q14. Calculate bookings and booking value by payment method.
+
+SELECT
+    Payment_Method,
+    COUNT(*) AS total_bookings,
+    ROUND(SUM(Booking_Value), 2) AS total_booking_value
+FROM bookings
+GROUP BY Payment_Method
+ORDER BY total_booking_value DESC;
+
+
+-- Q15. Find the top 10 customers by total booking value.
+
+SELECT
+    Customer_ID,
+    COUNT(*) AS total_bookings,
+    ROUND(SUM(Booking_Value), 2) AS total_booking_value
+FROM bookings
+WHERE Customer_ID IS NOT NULL
+GROUP BY Customer_ID
+ORDER BY total_booking_value DESC
+LIMIT 10;
+
+
+-- Q16. Compare average ride distance by booking status.
+
+SELECT
+    Booking_Status,
+    ROUND(AVG(Ride_Distance), 2) AS average_ride_distance,
+    COUNT(*) AS total_bookings
+FROM bookings
+GROUP BY Booking_Status
+ORDER BY average_ride_distance DESC;
+
+
+-- Q17. Find the most common customer cancellation reason.
+
+SELECT
+    Canceled_Rides_by_Customer,
+    COUNT(*) AS cancellation_count
+FROM bookings
+WHERE Canceled_Rides_by_Customer IS NOT NULL
+  AND TRIM(Canceled_Rides_by_Customer) <> ''
+GROUP BY Canceled_Rides_by_Customer
+ORDER BY cancellation_count DESC
+LIMIT 1;
+
+
+-- Q18. Find the most common driver cancellation reason.
+
+SELECT
+    Canceled_Rides_by_Driver,
+    COUNT(*) AS cancellation_count
+FROM bookings
+WHERE Canceled_Rides_by_Driver IS NOT NULL
+  AND TRIM(Canceled_Rides_by_Driver) <> ''
+GROUP BY Canceled_Rides_by_Driver
+ORDER BY cancellation_count DESC
+LIMIT 1;
+
+
+-- Q19. Find daily booking counts and the highest-booking day.
+
+SELECT
+    DATE(Date) AS booking_date,
+    COUNT(*) AS total_bookings
+FROM bookings
+GROUP BY DATE(Date)
+ORDER BY total_bookings DESC;
+
+
+-- Q20. Compare monthly booking value with the previous month.
+
+WITH monthly_sales AS (
+    SELECT
+        DATE_FORMAT(Date, '%Y-%m') AS booking_month,
+        SUM(Booking_Value) AS monthly_booking_value
+    FROM bookings
+    GROUP BY DATE_FORMAT(Date, '%Y-%m')
+),
+monthly_comparison AS (
+    SELECT
+        booking_month,
+        monthly_booking_value,
+        LAG(monthly_booking_value) OVER (
+            ORDER BY booking_month
+        ) AS previous_month_value
+    FROM monthly_sales
+)
+SELECT
+    booking_month,
+    ROUND(monthly_booking_value, 2) AS monthly_booking_value,
+    ROUND(previous_month_value, 2) AS previous_month_value,
+    ROUND(
+        monthly_booking_value - previous_month_value,
+        2
+    ) AS value_change
+FROM monthly_comparison
+ORDER BY booking_month;
+
+
+-- Q21. Calculate running total of booking value over time.
+
+WITH daily_sales AS (
+    SELECT
+        DATE(Date) AS booking_date,
+        SUM(Booking_Value) AS daily_booking_value
+    FROM bookings
+    GROUP BY DATE(Date)
+)
+SELECT
+    booking_date,
+    ROUND(daily_booking_value, 2) AS daily_booking_value,
+    ROUND(
+        SUM(daily_booking_value) OVER (
+            ORDER BY booking_date
+            ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+        ),
+        2
+    ) AS running_total_booking_value
+FROM daily_sales
+ORDER BY booking_date;
+
+
+-- Q22. Rank vehicle types by successful booking count.
+
+SELECT
+    Vehicle_Type,
+    COUNT(*) AS successful_bookings,
+    RANK() OVER (
+        ORDER BY COUNT(*) DESC
+    ) AS vehicle_rank
+FROM bookings
+WHERE Booking_Status = 'Success'
+GROUP BY Vehicle_Type
+ORDER BY vehicle_rank;
+
+
+-- Q23. Find customers whose booking value exceeds
+-- the average total booking value per customer.
+
+WITH customer_totals AS (
+    SELECT
+        Customer_ID,
+        SUM(Booking_Value) AS total_customer_value
+    FROM bookings
+    WHERE Customer_ID IS NOT NULL
+    GROUP BY Customer_ID
+)
+SELECT
+    Customer_ID,
+    ROUND(total_customer_value, 2) AS total_customer_value
+FROM customer_totals
+WHERE total_customer_value > (
+    SELECT AVG(total_customer_value)
+    FROM customer_totals
+)
+ORDER BY total_customer_value DESC;
+
+
+-- Q24. Calculate each payment method's contribution
+-- to total booking value (%).
+
+SELECT
+    Payment_Method,
+    ROUND(SUM(Booking_Value), 2) AS payment_method_value,
+    ROUND(
+        100.0 * SUM(Booking_Value)
+        / NULLIF(SUM(SUM(Booking_Value)) OVER (), 0),
+        2
+    ) AS contribution_percentage
+FROM bookings
+GROUP BY Payment_Method
+ORDER BY payment_method_value DESC;
+
+
+-- Q25. Find the top 3 customers by booking value
+-- within each vehicle type.
+
+WITH customer_vehicle_totals AS (
+    SELECT
+        Vehicle_Type,
+        Customer_ID,
+        SUM(Booking_Value) AS total_booking_value
+    FROM bookings
+    WHERE Customer_ID IS NOT NULL
+    GROUP BY Vehicle_Type, Customer_ID
+),
+ranked_customers AS (
+    SELECT
+        Vehicle_Type,
+        Customer_ID,
+        total_booking_value,
+        DENSE_RANK() OVER (
+            PARTITION BY Vehicle_Type
+            ORDER BY total_booking_value DESC
+        ) AS customer_rank
+    FROM customer_vehicle_totals
+)
+SELECT
+    Vehicle_Type,
+    Customer_ID,
+    ROUND(total_booking_value, 2) AS total_booking_value,
+    customer_rank
+FROM ranked_customers
+WHERE customer_rank <= 3
+ORDER BY Vehicle_Type, customer_rank;
+
+
+-- ============================================
+-- END OF ADVANCED BUSINESS ANALYSIS
+-- ============================================
