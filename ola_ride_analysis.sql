@@ -69,6 +69,7 @@ SELECT
     COUNT(*) AS total_customer_cancelled_rides
 FROM bookings
 WHERE Canceled_Rides_by_Customer IS NOT NULL
+  AND TRIM(Canceled_Rides_by_Customer) <> ''
   AND LOWER(TRIM(Canceled_Rides_by_Customer)) <> 'null';
 
 
@@ -346,12 +347,13 @@ ORDER BY average_ride_distance DESC;
 -- Q17. Find the most common customer cancellation reason.
 
 SELECT
-    Canceled_Rides_by_Customer,
+    TRIM(Canceled_Rides_by_Customer) AS cancellation_reason,
     COUNT(*) AS cancellation_count
 FROM bookings
 WHERE Canceled_Rides_by_Customer IS NOT NULL
   AND TRIM(Canceled_Rides_by_Customer) <> ''
-GROUP BY Canceled_Rides_by_Customer
+  AND LOWER(TRIM(Canceled_Rides_by_Customer)) <> 'null'
+GROUP BY TRIM(Canceled_Rides_by_Customer)
 ORDER BY cancellation_count DESC
 LIMIT 1;
 
@@ -359,12 +361,13 @@ LIMIT 1;
 -- Q18. Find the most common driver cancellation reason.
 
 SELECT
-    Canceled_Rides_by_Driver,
+    TRIM(Canceled_Rides_by_Driver) AS cancellation_reason,
     COUNT(*) AS cancellation_count
 FROM bookings
 WHERE Canceled_Rides_by_Driver IS NOT NULL
   AND TRIM(Canceled_Rides_by_Driver) <> ''
-GROUP BY Canceled_Rides_by_Driver
+  AND LOWER(TRIM(Canceled_Rides_by_Driver)) <> 'null'
+GROUP BY TRIM(Canceled_Rides_by_Driver)
 ORDER BY cancellation_count DESC
 LIMIT 1;
 
